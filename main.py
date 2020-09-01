@@ -4,6 +4,12 @@ import subprocess
 
 hub_user = 'screencom'
 
+def main():
+    json_obj = get_json()
+    for image in json_obj['results']:
+        image_name = "%s/%s" % (image['namespace'], image['name'])
+        refresh(image_name)
+
 def get_json():
     hub_url = 'https://hub.docker.com/v2/repositories/%s/?page_size=1000' % hub_user
     req = urllib.request.Request(hub_url)
@@ -19,13 +25,6 @@ def refresh(image_name):
     remove_command = "docker image ls | grep %s | awk '{ print $3 }' | xargs docker image rm" % image_name
     ps = subprocess.Popen(remove_command,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
     ps.communicate()
-
-def main():
-    json_obj = get_json()
-    for image in json_obj['results']:
-        image_name = "%s/%s" % (image['namespace'], image['name'])
-        refresh(image_name)
-
 
 if __name__ == '__main__':
     main()
